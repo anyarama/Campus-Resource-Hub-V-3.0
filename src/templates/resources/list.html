@@ -1,0 +1,87 @@
+{% extends 'layout.html' %}
+{% block title %}Resource directory{% endblock %}
+{% block page_heading %}Directory{% endblock %}
+{% block content %}
+<section class="directory-filters card-surface p-5">
+    <header>
+        <div>
+            <p class="text-caption text-uppercase mb-1">Resource hub</p>
+            <h2 class="text-h2 mb-0">Find the right resource</h2>
+        </div>
+        <div class="text-end">
+            <p class="text-body fw-semibold mb-1">{{ resources|length }} results</p>
+            {% set any_filter = filters.keyword or filters.category or filters.location or filters.min_capacity %}
+            <p class="text-caption mb-0">
+                {% if any_filter %}
+                    Filters applied
+                {% else %}
+                    Showing all available listings
+                {% endif %}
+            </p>
+        </div>
+    </header>
+    <form method="get" class="filter-form">
+        <div class="form-field">
+            <label class="form-label" for="keyword">Keyword</label>
+            <input class="form-control" id="keyword" name="keyword" value="{{ filters.keyword }}" placeholder="Search title or description">
+        </div>
+        <div class="form-field">
+            <label class="form-label" for="category">Category</label>
+            <select class="form-select" id="category" name="category">
+                <option value="">Any</option>
+                {% for category in categories %}
+                <option value="{{ category }}" {% if filters.category == category %}selected{% endif %}>{{ category }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-field">
+            <label class="form-label" for="location">Location</label>
+            <input class="form-control" id="location" name="location" value="{{ filters.location }}" placeholder="Building or campus">
+        </div>
+        <div class="form-field">
+            <label class="form-label" for="min_capacity">Min capacity</label>
+            <input class="form-control" id="min_capacity" name="min_capacity" value="{{ filters.min_capacity }}" type="number" placeholder="20">
+        </div>
+        <div class="filter-actions">
+            <button class="btn btn-primary-iu" type="submit">Apply filters</button>
+            <a class="btn btn-ghost-iu" href="{{ url_for('resource.browse') }}">Reset</a>
+        </div>
+    </form>
+    {% if any_filter %}
+    <div class="filter-chips">
+        {% if filters.keyword %}<span class="filter-chip">Keyword: {{ filters.keyword }}</span>{% endif %}
+        {% if filters.category %}<span class="filter-chip">Category: {{ filters.category }}</span>{% endif %}
+        {% if filters.location %}<span class="filter-chip">Location: {{ filters.location }}</span>{% endif %}
+        {% if filters.min_capacity %}<span class="filter-chip">Min seats: {{ filters.min_capacity }}</span>{% endif %}
+    </div>
+    {% endif %}
+</section>
+
+<section>
+    <div class="resource-grid">
+        {% for resource in resources %}
+        <article class="resource-card">
+            <div class="resource-card-header">
+                <span class="badge-pill">{{ resource.category }}</span>
+                {% if resource.capacity %}
+                <span class="resource-meta">Seats {{ resource.capacity }}</span>
+                {% endif %}
+            </div>
+            <h3 class="text-h3 mb-1">{{ resource.title }}</h3>
+            <p class="text-body">{{ resource.summary[:160] }}{% if resource.summary|length > 160 %}&hellip;{% endif %}</p>
+            <div class="resource-meta">
+                <p class="mb-1"><strong>Location:</strong> {{ resource.location }}</p>
+                {% if resource.availability_notes %}
+                <p class="mb-1"><strong>Notes:</strong> {{ resource.availability_notes }}</p>
+                {% endif %}
+            </div>
+            <div class="resource-footer">
+                <a href="{{ url_for('resource.detail', resource_id=resource.resource_id) }}" class="btn btn-primary-iu">View details</a>
+            </div>
+        </article>
+        {% else %}
+        <p class="text-muted">No resources match your filters yet.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

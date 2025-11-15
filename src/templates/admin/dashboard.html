@@ -1,0 +1,177 @@
+{% extends 'layout.html' %}
+{% block title %}Admin{% endblock %}
+{% block page_heading %}Admin control center{% endblock %}
+{% block content %}
+<section class="admin-hero card-surface p-5 mb-4">
+    <div class="d-flex justify-content-between flex-wrap gap-4">
+        <div>
+            <p class="text-caption text-uppercase mb-1">Campus systems overview</p>
+            <h1 class="text-h1 mb-2">Admin control center</h1>
+            <p class="text-body mb-0">Monitor bookings, inventory, and community signals from one panel.</p>
+        </div>
+        <div class="d-flex gap-3 align-items-start">
+            <a class="btn btn-primary-iu" href="{{ url_for('resource.create') }}">Create resource</a>
+        </div>
+    </div>
+    <div class="hero-pills">
+        <div class="hero-pill">
+            <p class="text-caption text-uppercase mb-1">Active listings</p>
+            <p class="text-h3 mb-0">{{ stats.total_resources }}</p>
+        </div>
+        <div class="hero-pill">
+            <p class="text-caption text-uppercase mb-1">Pending approvals</p>
+            <p class="text-h3 mb-0">{{ stats.pending_requests }}</p>
+        </div>
+        <div class="hero-pill">
+            <p class="text-caption text-uppercase mb-1">Users</p>
+            <p class="text-h3 mb-0">{{ stats.total_users }}</p>
+        </div>
+    </div>
+</section>
+
+<section class="stat-card-grid mb-4">
+    <article class="stat-card">
+        <p class="stat-label">Bookings (30d)</p>
+        <p class="stat-value">{{ bookings|length }}</p>
+        <p class="text-caption mb-0">Recent bookings across all resources.</p>
+    </article>
+    <article class="stat-card">
+        <p class="stat-label">Reviews logged</p>
+        <p class="stat-value">{{ reviews|length }}</p>
+        <p class="text-caption mb-0">Feedback awaiting moderation.</p>
+    </article>
+    <article class="stat-card">
+        <p class="stat-label">Demo metric</p>
+        <p class="stat-value">82%</p>
+        <p class="text-caption mb-0">Placeholder engagement trend.</p>
+    </article>
+</section>
+
+<section class="dashboard-grid-two mb-4">
+    <article class="analytics-card">
+        <p class="text-caption text-uppercase mb-1">Queue health</p>
+        <h2 class="text-h3 mb-2">Bookings awaiting decision</h2>
+        <p class="text-body mb-0">{{ stats.pending_requests }} booking{{ 's' if stats.pending_requests != 1 else '' }} currently waiting for owner action.</p>
+    </article>
+    <article class="analytics-card">
+        <p class="text-caption text-uppercase mb-1">Inventory status</p>
+        <h2 class="text-h3 mb-2">Live versus draft</h2>
+        <p class="text-body mb-0">{{ stats.total_resources }} total resources. Keep drafts moving to published for better discoverability.</p>
+    </article>
+</section>
+
+<section class="card-surface p-5 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-h3 mb-0">Recent bookings</h2>
+    </div>
+    <div class="table-panel table-dense">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Resource</th>
+                    <th>Status</th>
+                    <th class="text-end">Change</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.booking_id }}</td>
+                    <td>{{ booking.resource_id }}</td>
+                    <td><span class="status-pill {% if booking.status=='approved' %}success{% elif booking.status=='pending' %}warning{% else %}danger{% endif %}">{{ booking.status|title }}</span></td>
+                    <td class="text-end">
+                        <form method="post" action="{{ url_for('admin.override_booking', booking_id=booking.booking_id) }}" class="d-inline-flex gap-2 align-items-center">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <select class="form-select form-select-sm" name="status">
+                                {% for status in ['pending','approved','completed','rejected','cancelled'] %}
+                                <option value="{{ status }}" {% if booking.status==status %}selected{% endif %}>{{ status }}</option>
+                                {% endfor %}
+                            </select>
+                            <button class="btn btn-secondary-iu btn-sm" type="submit">Save</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="card-surface p-5 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-h3 mb-0">Latest reviews</h2>
+    </div>
+    {% if reviews %}
+    <ul class="dashboard-list">
+        {% for review in reviews %}
+        <li class="dashboard-list-item">
+            <div>
+                <strong>{{ review.rating }}/5</strong>
+                <p class="text-caption mb-0">Resource #{{ review.resource_id }}</p>
+                <p class="text-body mb-0">{{ review.comment or 'No comment provided.' }}</p>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-muted mb-0">No reviews yet.</p>
+    {% endif %}
+</section>
+
+<section class="card-surface p-5 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-h3 mb-0">Users</h2>
+    </div>
+    <div class="table-panel table-dense">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.user_id }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="card-surface p-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-h3 mb-0">Resources</h2>
+    </div>
+    <div class="table-panel table-dense">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Owner</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resource in resources %}
+                <tr>
+                    <td>{{ resource.resource_id }}</td>
+                    <td>{{ resource.title }}</td>
+                    <td>{{ resource.owner_id }}</td>
+                    <td>{{ resource.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

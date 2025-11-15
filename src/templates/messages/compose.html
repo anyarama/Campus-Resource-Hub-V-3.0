@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+{% block title %}New message{% endblock %}
+{% block page_heading %}New message{% endblock %}
+{% block content %}
+<div class="card-surface p-4 mx-auto" style="max-width: 640px;">
+    <p class="text-muted">Ask a quick question about {{ resource.title if resource else 'a resource' }}.</p>
+    <form method="post" class="row g-3">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="col-12">
+            <label class="form-label" for="body">Message</label>
+            <textarea class="form-control" id="body" name="body" rows="5"></textarea>
+        </div>
+        <div class="col-12 d-flex justify-content-end">
+            <button class="btn btn-primary-solid" type="submit">Send</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

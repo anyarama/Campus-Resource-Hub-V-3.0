@@ -1,0 +1,55 @@
+{% extends 'layout.html' %}
+{% block title %}Request booking{% endblock %}
+{% block page_heading %}Reserve {{ resource.title }}{% endblock %}
+{% block content %}
+{% if resource.status != 'published' %}
+<div class="alert-banner" role="status">
+    <div>
+        <strong>This listing is {{ resource.status }}.</strong>
+        <p class="mb-0">Requests may be delayed until the owner republishes the resource.</p>
+    </div>
+</div>
+{% else %}
+<div class="alert-banner" role="status">
+    <div>
+        <strong>Heads up:</strong>
+        <p class="mb-0">Most bookings require owner approval. You'll be notified once it's reviewed.</p>
+    </div>
+</div>
+{% endif %}
+
+<div class="booking-form-grid">
+    <section class="card-surface p-5">
+        <p class="text-caption text-uppercase mb-3">Request details</p>
+        <form method="post" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-field">
+                <label class="form-label" for="start_datetime">Start</label>
+                <input class="form-control" type="datetime-local" id="start_datetime" name="start_datetime" value="{{ form.start_datetime }}" required>
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="end_datetime">End</label>
+                <input class="form-control" type="datetime-local" id="end_datetime" name="end_datetime" value="{{ form.end_datetime }}" required>
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="notes">Notes for owner</label>
+                <textarea class="form-control" id="notes" name="notes" rows="4">{{ form.notes }}</textarea>
+                <div class="form-help">Share context like event details, setup needs, or collaborators.</div>
+            </div>
+            <div class="form-actions">
+                <a class="btn btn-secondary-iu" href="{{ url_for('resource.detail', resource_id=resource.resource_id) }}">Cancel</a>
+                <button class="btn btn-primary-iu" type="submit">Submit request</button>
+            </div>
+        </form>
+    </section>
+    <aside class="snapshot-card">
+        <p class="text-caption text-uppercase">Resource snapshot</p>
+        <h2 class="text-h3 mb-1">{{ resource.title }}</h2>
+        <p class="text-body mb-3">{{ resource.summary }}</p>
+        <p class="text-body mb-1"><strong>Location:</strong> {{ resource.location }}</p>
+        <p class="text-body mb-1"><strong>Capacity:</strong> {{ resource.capacity }}</p>
+        <p class="text-body mb-1"><strong>Status:</strong> {{ resource.status|title }}</p>
+        <p class="text-body mb-0"><strong>Notes:</strong> {{ resource.availability_notes or 'No additional notes.' }}</p>
+    </aside>
+</div>
+{% endblock %}

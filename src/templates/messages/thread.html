@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+{% block title %}Conversation{% endblock %}
+{% block page_heading %}Conversation{% endblock %}
+{% block content %}
+<section class="card-surface p-5 mb-4">
+    <div class="d-flex justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <p class="text-caption text-uppercase mb-1">Thread</p>
+            <h1 class="text-h2 mb-0">{{ resource.title if resource else 'Conversation' }}</h1>
+        </div>
+        <div class="text-end">
+            <p class="text-caption mb-0">{{ other_user.name }}</p>
+        </div>
+    </div>
+    <div class="d-flex flex-column">
+        {% for msg in messages %}
+        <div class="message-bubble {% if msg.sender_id == current_user.user_id %}me{% else %}them{% endif %}">
+            <div class="d-flex justify-content-between mb-2">
+                <strong>{% if msg.sender_id == current_user.user_id %}You{% else %}{{ other_user.name }}{% endif %}</strong>
+                <span class="text-caption">{{ msg.created_at }}</span>
+            </div>
+            <p class="text-body mb-0">{{ msg.body }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    <form method="post" class="composer">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-field">
+            <label class="form-label" for="body">Reply</label>
+            <textarea class="form-control" id="body" name="body" rows="3"></textarea>
+        </div>
+        <button class="btn btn-primary-iu" type="submit">Send</button>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+{% block title %}Messages{% endblock %}
+{% block page_heading %}Messages{% endblock %}
+{% block content %}
+<section class="card-surface p-5">
+    <div class="inbox-header">
+        <div>
+            <p class="text-caption text-uppercase mb-1">Inbox</p>
+            <h2 class="text-h2 mb-0">Conversations</h2>
+        </div>
+        <form class="d-flex gap-2" method="get">
+            <input class="form-control" type="search" name="q" placeholder="Search" value="{{ request.args.get('q', '') }}">
+            <button class="btn btn-secondary-iu" type="submit">Search</button>
+        </form>
+    </div>
+    <div class="filter-pills mb-4">
+        <span class="badge-pill">All</span>
+        <span class="badge-pill">Unread</span>
+        <span class="badge-pill">Archived</span>
+    </div>
+    {% if thread_cards %}
+    <div class="inbox-list">
+        {% for card in thread_cards %}
+        <a href="{{ url_for('message.thread', thread_id=card.thread.thread_id) }}" class="inbox-thread text-decoration-none">
+            <div>
+                <p class="text-body mb-1 fw-semibold">{{ card.other_user.name if card.other_user else 'Conversation' }}</p>
+                <p class="text-caption mb-1">
+                    {% if card.resource %}
+                        {{ card.resource.title }}
+                    {% else %}
+                        Resource #{{ card.thread.resource_id or 'N/A' }}
+                    {% endif %}
+                </p>
+                <p class="text-caption mb-0">{{ card.thread.preview or 'Conversation started' }}</p>
+            </div>
+            <div class="text-end">
+                <span class="text-caption">{{ card.thread.updated_at }}</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted mb-0">No conversations yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

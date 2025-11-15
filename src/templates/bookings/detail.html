@@ -1,0 +1,58 @@
+{% extends 'layout.html' %}
+{% block title %}Booking #{{ booking.booking_id }}{% endblock %}
+{% block page_heading %}Booking #{{ booking.booking_id }}{% endblock %}
+{% block content %}
+<section class="booking-hero card-surface p-5 mb-4">
+    <div class="d-flex justify-content-between flex-wrap gap-3">
+        <div>
+            <p class="text-caption text-uppercase mb-1">Reservation overview</p>
+            <h1 class="text-h2 mb-1">{{ resource.title if resource else 'Resource #' ~ booking.resource_id }}</h1>
+            <p class="text-body mb-0">{{ booking.start_datetime }} – {{ booking.end_datetime }}</p>
+        </div>
+        <span class="status-pill {% if booking.status=='approved' %}success{% elif booking.status=='pending' %}warning{% elif booking.status=='completed' %}success{% else %}danger{% endif %}">{{ booking.status|title }}</span>
+    </div>
+</section>
+
+<div class="detail-grid">
+    <section class="card-surface p-5">
+        <div class="booking-meta-grid mb-4">
+            <div>
+                <p class="text-caption text-uppercase mb-1">Location</p>
+                <p class="text-body mb-0">{{ resource.location if resource else 'TBD' }}</p>
+            </div>
+            <div>
+                <p class="text-caption text-uppercase mb-1">Capacity</p>
+                <p class="text-body mb-0">{{ resource.capacity if resource else '—' }}</p>
+            </div>
+            <div>
+                <p class="text-caption text-uppercase mb-1">Notes</p>
+                <p class="text-body mb-0">{{ booking.notes or 'No requester notes.' }}</p>
+            </div>
+        </div>
+        <h2 class="text-h3 mb-3">Timeline</h2>
+        <ul class="timeline">
+            <li class="timeline-item">
+                <p class="text-body mb-1">Request submitted</p>
+                <p class="text-caption mb-0">{{ booking.created_at }}</p>
+            </li>
+            {% if booking.decision_at %}
+            <li class="timeline-item">
+                <p class="text-body mb-1">Decision recorded</p>
+                <p class="text-caption mb-0">{{ booking.decision_at }}</p>
+                {% if booking.owner_notes %}
+                <p class="text-caption mt-1">Owner notes: {{ booking.owner_notes }}</p>
+                {% endif %}
+            </li>
+            {% endif %}
+        </ul>
+    </section>
+    <aside class="card-surface p-5 owner-card">
+        <p class="text-caption text-uppercase mb-1">Contact owner</p>
+        <p class="text-body">Use the messaging tool to coordinate details or ask for adjustments.</p>
+        <div class="d-flex flex-column gap-2">
+            <a class="btn btn-primary-iu" href="{{ url_for('message.start', owner_id=resource.owner_id, resource_id=resource.resource_id) }}">Message owner</a>
+            <a class="btn btn-secondary-iu" href="{{ url_for('resource.detail', resource_id=booking.resource_id) }}">View resource</a>
+        </div>
+    </aside>
+</div>
+{% endblock %}

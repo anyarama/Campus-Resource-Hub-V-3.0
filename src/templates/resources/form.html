@@ -1,0 +1,73 @@
+{% extends 'layout.html' %}
+{% block title %}{% if resource %}Edit{% else %}Create{% endif %} resource{% endblock %}
+{% block page_heading %}{% if resource %}Edit listing{% else %}New listing{% endif %}{% endblock %}
+{% block content %}
+<div class="card-surface p-5">
+    <p class="text-caption text-uppercase mb-4">Provide accurate availability and location details so students can plan ahead.</p>
+    <form method="post" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <section class="form-section">
+            <h2 class="form-section-title">Basic information</h2>
+            <div class="form-section-grid">
+                <div class="form-field">
+                    <label class="form-label" for="title">Title</label>
+                    <input class="form-control" id="title" name="title" value="{{ form.title }}">
+                </div>
+                <div class="form-field">
+                    <label class="form-label" for="category">Category</label>
+                    <select class="form-select" id="category" name="category">
+                        {% for category in categories %}
+                        <option value="{{ category }}" {% if form.category == category %}selected{% endif %}>{{ category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-field" style="grid-column: 1 / -1;">
+                    <label class="form-label" for="summary">Summary</label>
+                    <textarea class="form-control" id="summary" name="summary" rows="4">{{ form.summary }}</textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <h2 class="form-section-title">Location & capacity</h2>
+            <div class="form-section-grid">
+                <div class="form-field">
+                    <label class="form-label" for="location">Location</label>
+                    <input class="form-control" id="location" name="location" value="{{ form.location }}">
+                </div>
+                <div class="form-field">
+                    <label class="form-label" for="capacity">Capacity</label>
+                    <input class="form-control" id="capacity" name="capacity" type="number" value="{{ form.capacity }}">
+                </div>
+                <div class="form-field">
+                    <label class="form-label" for="status">Visibility</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="draft" {% if form.status == 'draft' %}selected{% endif %}>Draft</option>
+                        <option value="published" {% if form.status == 'published' %}selected{% endif %}>Published</option>
+                        <option value="archived" {% if form.status == 'archived' %}selected{% endif %}>Archived</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <h2 class="form-section-title">Guidelines</h2>
+            <div class="form-field">
+                <label class="form-label" for="availability_notes">Availability notes</label>
+                <textarea class="form-control" id="availability_notes" name="availability_notes" rows="3">{{ form.availability_notes }}</textarea>
+                <div class="form-help">Share scheduling expectations such as pickup windows or staffing needs.</div>
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="images">Gallery images</label>
+                <input class="form-control" type="file" id="images" name="images" multiple>
+                <div class="form-help">JPEG/PNG up to 16 MB combined.</div>
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <a class="btn btn-secondary-iu" href="{{ url_for('resource.my_resources') }}">Cancel</a>
+            <button class="btn btn-primary-iu" type="submit">Save listing</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

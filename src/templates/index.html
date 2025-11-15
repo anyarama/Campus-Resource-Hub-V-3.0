@@ -1,0 +1,95 @@
+{% extends 'layout.html' %}
+{% block title %}Campus Hub | Discover{% endblock %}
+{% block page_heading %}Discover campus-friendly spaces{% endblock %}
+{% block content %}
+<section class="hero-section">
+    <div class="hero-grid">
+        <div>
+            <p class="hero-kicker">Indiana University Bloomington</p>
+            <h1 class="text-h1 mb-3">Book campus spaces in seconds, not emails.</h1>
+            <p class="text-body mb-4">From study rooms to maker spaces—explore curated listings, check availability instantly, and collaborate with facility teams in one place.</p>
+            <form class="hero-search" action="{{ url_for('resource.browse') }}" method="get">
+                <label class="visually-hidden" for="hero-keyword">Search resources</label>
+                <input class="form-control" id="hero-keyword" type="text" name="keyword" placeholder="Search for study rooms, labs, AV kits..." value="{{ keyword }}">
+                <button class="btn btn-primary-iu" type="submit">Search directory</button>
+            </form>
+            <div class="hero-actions">
+                <a href="{{ url_for('resource.browse') }}" class="btn btn-primary-iu">Start exploring</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('resource.create') }}" class="btn btn-secondary-iu">List a resource</a>
+                {% else %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-secondary-iu">Create free account</a>
+                {% endif %}
+            </div>
+        </div>
+        <div>
+            <div class="stat-card">
+                <p class="text-caption text-uppercase">Platform snapshot</p>
+                <div class="stat-metrics">
+                    <div>
+                        <p class="text-caption mb-1">Total listings</p>
+                        <p class="text-h2 mb-0">{{ stats['total'] or 0 }}</p>
+                    </div>
+                    <div>
+                        <p class="text-caption mb-1">Published today</p>
+                        <p class="text-h2 mb-0">{{ stats['published'] or 0 }}</p>
+                    </div>
+                    <div>
+                        <p class="text-caption mb-1">Average seats</p>
+                        <p class="text-h2 mb-0">{{ (stats['avg_capacity'] or 0)|int }}</p>
+                    </div>
+                </div>
+                <p class="text-caption mt-4 mb-0">Invite collaborators from your department and manage bookings together.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mb-5">
+    <div class="highlight-heading">
+        <div>
+            <p class="text-caption text-uppercase mb-1">Spotlight</p>
+            <h2 class="text-h2 mb-0">Highlighted resources</h2>
+        </div>
+        <a href="{{ url_for('resource.browse') }}" class="btn btn-ghost-iu">View full directory</a>
+    </div>
+    <div class="resource-grid">
+        {% for resource in highlighted %}
+        <article class="resource-card">
+            <div class="resource-card-header">
+                <span class="badge-pill">{{ resource.category }}</span>
+                {% if resource.capacity %}
+                <span class="resource-meta">Seats {{ resource.capacity }}</span>
+                {% endif %}
+            </div>
+            <h3 class="text-h3 mb-1">{{ resource.title }}</h3>
+            <p class="text-body">{{ resource.summary[:140] }}{% if resource.summary|length > 140 %}&hellip;{% endif %}</p>
+            <p class="resource-meta"><strong>Location:</strong> {{ resource.location }}</p>
+            <div class="resource-footer">
+                <a href="{{ url_for('resource.detail', resource_id=resource.resource_id) }}" class="btn btn-primary-iu">See details</a>
+            </div>
+        </article>
+        {% else %}
+        <p class="text-muted mb-0">No highlighted resources yet. Add one from your dashboard.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="insight-grid">
+    <article class="dashboard-card insight-card">
+        <p class="text-caption text-uppercase mb-2">Why Campus Hub</p>
+        <h3 class="text-h3 mb-2">Real-time availability</h3>
+        <p class="text-body mb-0">Sync approvals and see openings instantly so departments stop juggling email chains.</p>
+    </article>
+    <article class="dashboard-card insight-card">
+        <p class="text-caption text-uppercase mb-2">Collaboration</p>
+        <h3 class="text-h3 mb-2">Shared workflows</h3>
+        <p class="text-body mb-0">Message requesters, track reviews, and coordinate staffing right from your dashboard.</p>
+    </article>
+    <article class="dashboard-card insight-card">
+        <p class="text-caption text-uppercase mb-2">Campus-ready</p>
+        <h3 class="text-h3 mb-2">Built for IU teams</h3>
+        <p class="text-body mb-0">Role-based access ensures students, staff, and admins get exactly the tools they need.</p>
+    </article>
+</section>
+{% endblock %}

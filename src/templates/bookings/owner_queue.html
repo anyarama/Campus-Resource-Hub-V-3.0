@@ -1,0 +1,60 @@
+{% extends 'layout.html' %}
+{% block title %}Booking approvals{% endblock %}
+{% block page_heading %}Approval queue{% endblock %}
+{% block content %}
+<section class="card-surface p-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <p class="text-caption text-uppercase mb-1">Resource requests</p>
+            <h2 class="text-h2 mb-0">Review booking requests</h2>
+        </div>
+    </div>
+    {% if bookings %}
+    <div class="table-panel">
+        <table>
+            <thead>
+                <tr>
+                    <th>Resource</th>
+                    <th>Requester</th>
+                    <th>Schedule</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                {% set resource = resources[booking.resource_id] %}
+                <tr>
+                    <td>
+                        <strong>{{ resource.title if resource else 'Resource #' ~ booking.resource_id }}</strong><br>
+                        <span class="text-caption">{{ resource.location if resource else '' }}</span>
+                    </td>
+                    <td>
+                        <span class="text-body">User #{{ booking.requester_id }}</span>
+                    </td>
+                    <td>
+                        <span class="text-caption">{{ booking.start_datetime }} – {{ booking.end_datetime }}</span>
+                    </td>
+                    <td>
+                        <span class="status-pill warning">Pending</span>
+                    </td>
+                    <td class="text-end">
+                        {% if current_user.role in ['staff', 'admin'] %}
+                        <form method="post" action="{{ url_for('booking.decide_booking', booking_id=booking.booking_id) }}" class="d-inline-flex gap-2">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="owner_notes" value="">
+                            <button class="btn btn-primary-iu" name="action" value="approve" type="submit">Approve</button>
+                            <button class="btn btn-secondary-iu" name="action" value="reject" type="submit">Reject</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-muted mb-0">No pending requests.</p>
+    {% endif %}
+</section>
+{% endblock %}

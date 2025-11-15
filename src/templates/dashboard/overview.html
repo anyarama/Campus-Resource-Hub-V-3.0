@@ -1,0 +1,116 @@
+{% extends 'layout.html' %}
+{% block title %}Workspace{% endblock %}
+{% block page_heading %}Workspace overview{% endblock %}
+{% block content %}
+<section class="dashboard-hero">
+    <div class="dashboard-hero-header">
+        <div>
+            <p class="text-caption text-uppercase mb-1">Welcome back</p>
+            <h1 class="text-h1 mb-2">Your campus workspace</h1>
+            <p class="text-body mb-0">Track bookings, manage listings, and stay ahead of approvals.</p>
+        </div>
+        <div class="text-end">
+            <span class="role-chip">{{ current_user.role|upper if current_user else 'STUDENT' }}</span>
+            <div class="calendar-pill mt-3">Today · {{ current_user.name if current_user else 'Guest' }}</div>
+        </div>
+    </div>
+    <div class="d-flex gap-3 flex-wrap">
+        <a href="{{ url_for('resource.browse') }}" class="btn btn-primary-iu">Create booking</a>
+        {% if current_user.role in ['staff', 'admin'] %}
+        <a href="{{ url_for('resource.create') }}" class="btn btn-secondary-iu">Add resource</a>
+        {% endif %}
+    </div>
+</section>
+
+<section class="stat-card-grid">
+    {% if current_user.role in ['staff', 'admin'] %}
+    <article class="stat-card">
+        <p class="stat-label">My listings</p>
+        <p class="stat-value">{{ listings|length }}</p>
+        <p class="text-caption mb-0">Drafts and published resources combined.</p>
+    </article>
+    {% endif %}
+    <article class="stat-card">
+        <p class="stat-label">Upcoming bookings</p>
+        <p class="stat-value">{{ my_bookings|length }}</p>
+        <p class="text-caption mb-0">Next {{ my_bookings|length if my_bookings|length < 3 else 3 }} bookings shown below.</p>
+    </article>
+    {% if current_user.role in ['staff', 'admin'] %}
+    <article class="stat-card">
+        <p class="stat-label">Approvals needed</p>
+        <p class="stat-value">{{ pending_actions|length }}</p>
+        <p class="text-caption mb-0">Requests waiting for your review.</p>
+    </article>
+    {% endif %}
+</section>
+<section class="dashboard-grid-two">
+    <article class="card-surface p-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <p class="text-caption text-uppercase mb-1">Bookings</p>
+                <h2 class="text-h3 mb-0">Upcoming</h2>
+            </div>
+            <a href="{{ url_for('booking.my_bookings') }}" class="btn btn-ghost-iu">View all</a>
+        </div>
+        {% if my_bookings %}
+        <ul class="dashboard-list">
+            {% for booking in my_bookings[:5] %}
+            <li class="dashboard-list-item">
+                <div>
+                    <p class="text-body mb-1">Resource #{{ booking.resource_id }}</p>
+                    <p class="text-caption mb-1">{{ booking.start_datetime }} – {{ booking.end_datetime }}</p>
+                </div>
+                <span class="status-pill {% if booking.status=='approved' %}success{% elif booking.status=='pending' %}warning{% else %}danger{% endif %}">{{ booking.status|title }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted mb-0">No bookings yet. Start by browsing resources.</p>
+        {% endif %}
+    </article>
+    <article class="card-surface p-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <p class="text-caption text-uppercase mb-1">Messages</p>
+                <h2 class="text-h3 mb-0">Recent threads</h2>
+            </div>
+            <a href="{{ url_for('message.inbox') }}" class="btn btn-ghost-iu">Open inbox</a>
+        </div>
+        {% if notifications %}
+        <ul class="dashboard-list">
+            {% for note in notifications[:4] %}
+            <li class="dashboard-list-item">
+                <div>
+                    <p class="text-body mb-1">{{ note['message'] }}</p>
+                    <p class="text-caption mb-0">{{ note['created_at'] }}</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted mb-0">No messages yet. Keep an eye on your inbox.</p>
+        {% endif %}
+    </article>
+</section>
+
+<section class="dashboard-grid-two">
+    <article class="card-surface p-5 callout-card">
+        <p class="text-caption text-uppercase mb-2">Calendar sync</p>
+        <h2 class="text-h3 mb-2">Sync bookings to your calendar</h2>
+        <p class="text-body mb-4">Download booking confirmations or add them to your campus calendar to stay aligned.</p>
+        <a class="btn btn-secondary-iu" href="{{ url_for('booking.my_bookings') }}">Export bookings</a>
+    </article>
+    <article class="card-surface p-5">
+        <p class="text-caption text-uppercase mb-2">Campus spotlights</p>
+        <div class="resource-grid">
+            {% for resource in spotlight[:3] %}
+            <article class="resource-card">
+                <span class="badge-pill mb-2">{{ resource.category }}</span>
+                <h4 class="text-h4 mb-1">{{ resource.title }}</h4>
+                <p class="text-body">{{ resource.summary[:100] }}&hellip;</p>
+            </article>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'layout.html' %}
+{% block page_heading %}Design surface{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-6">
+        <section class="p-4 bg-white rounded shadow-sm">
+            <h2 class="h5">Buttons</h2>
+            <div class="d-flex gap-2 flex-wrap">
+                <button class="btn btn-danger">Danger action</button>
+                <button class="btn btn-outline-secondary">Outline button</button>
+                <button class="btn btn-link">Link button</button>
+            </div>
+        </section>
+    </div>
+    <div class="col-lg-6">
+        <section class="p-4 bg-white rounded shadow-sm">
+            <h2 class="h5">Cards</h2>
+            <div class="row g-3">
+                {% for resource in sample_resources %}
+                <div class="col-12 col-md-6">
+                    <article class="card resource-card h-100">
+                        <div class="card-body">
+                            <p class="badge bg-light text-dark text-uppercase mb-2">{{ resource.category }}</p>
+                            <h3 class="h6">{{ resource.title }}</h3>
+                            <p class="text-muted small">{{ resource.summary[:90] }}&hellip;</p>
+                        </div>
+                    </article>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

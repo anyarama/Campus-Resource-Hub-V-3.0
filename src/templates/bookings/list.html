@@ -1,0 +1,52 @@
+{% extends 'layout.html' %}
+{% block title %}My bookings{% endblock %}
+{% block page_heading %}My bookings{% endblock %}
+{% block content %}
+<section class="card-surface p-5 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <p class="text-caption text-uppercase mb-1">My reservations</p>
+            <h2 class="text-h2 mb-0">Bookings & statuses</h2>
+        </div>
+        <a class="btn btn-secondary-iu" href="{{ url_for('resource.browse') }}">Browse resources</a>
+    </div>
+    {% if bookings %}
+    <div class="table-panel">
+        <table>
+            <thead>
+                <tr>
+                    <th>Resource</th>
+                    <th>Schedule</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                {% set resource = resources[booking.resource_id] %}
+                <tr>
+                    <td>
+                        <strong>{{ resource.title if resource else 'Resource #' ~ booking.resource_id }}</strong><br>
+                        <span class="text-caption">{{ resource.location if resource else '' }}</span>
+                    </td>
+                    <td>
+                        <p class="text-caption mb-0">{{ booking.start_datetime }} – {{ booking.end_datetime }}</p>
+                    </td>
+                    <td>
+                        <span class="status-pill {% if booking.status=='approved' %}success{% elif booking.status=='pending' %}warning{% elif booking.status=='completed' %}success{% else %}danger{% endif %}">{{ booking.status|title }}</span>
+                    </td>
+                    <td class="text-end">
+                        {% if resource %}
+                        <a class="btn btn-ghost-iu" href="{{ url_for('resource.detail', resource_id=resource.resource_id) }}">View resource</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-muted mb-0">No bookings yet. Visit the directory to submit one.</p>
+    {% endif %}
+</section>
+{% endblock %}

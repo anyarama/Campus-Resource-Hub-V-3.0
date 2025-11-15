@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+{% block title %}Create account | Campus Hub{% endblock %}
+{% block page_heading %}Create an account{% endblock %}
+{% block content %}
+<div class="auth-wrapper">
+    <section class="card-surface auth-card">
+        <div class="text-center mb-4">
+            <div class="auth-icon">★</div>
+            <h1 class="text-h2 mb-1">Create your campus account</h1>
+            <p class="text-body text-secondary mb-0">Use your institutional email to publish listings, manage bookings, and message requesters.</p>
+        </div>
+        <form method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-field">
+                <label class="form-label" for="name">Full name</label>
+                <input class="form-control" id="name" name="name" value="{{ form.name }}">
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="department">Department / Unit</label>
+                <input class="form-control" id="department" name="department" value="{{ form.department }}">
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="role">Role</label>
+                <select class="form-select" id="role" name="role">
+                    <option value="student" {% if form.role != 'staff' %}selected{% endif %}>Student</option>
+                    <option value="staff" {% if form.role == 'staff' %}selected{% endif %}>Staff / Resource Manager</option>
+                </select>
+                <div class="form-help">Select "Staff" if you manage resources and need listing/approval access.</div>
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="email">Campus email</label>
+                <input class="form-control" type="email" id="email" name="email" value="{{ form.email }}">
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="password">Password</label>
+                <input class="form-control" type="password" id="password" name="password">
+                <div class="form-help">Use at least 8 characters with a mix of cases.</div>
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="confirm_password">Confirm password</label>
+                <input class="form-control" type="password" id="confirm_password" name="confirm_password">
+            </div>
+            <button class="btn btn-primary-iu auth-submit" type="submit">Create account</button>
+        </form>
+        <div class="auth-footer mt-4">
+            Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a>.
+        </div>
+    </section>
+</div>
+{% endblock %}
